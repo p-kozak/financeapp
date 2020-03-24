@@ -18,4 +18,5 @@ namespace PersonalFinance.Domain
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
     }
+
 }

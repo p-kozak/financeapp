@@ -11,8 +11,12 @@ namespace PersonalFinance.Data.Repositories
         void AddTransaction(Transaction transaction);
 
         void OpenBalance(Customer user, int currency);
-        bool UserExists(Customer user);
+        bool CustomerExists(Customer user);
         CustomerBalance GetBalance(Customer user, int currency);
-        IEnumerable<BalanceHistory> GetBalanceHistory(Customer user, int currency);
+        ICollection<BalanceHistory> GetBalanceHistory(Customer customer, int currency);
+
+        ICollection<CustomerBalance> GetCustomerBalances(Customer customer);
+
+        Customer GetCustomerByIdentityId(string identityId);
     }
 }

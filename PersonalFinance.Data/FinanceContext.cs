@@ -8,7 +8,7 @@ namespace PersonalFinance.Data
 {
     public class FinanceContext : IdentityDbContext<User>
     {
-        public FinanceContext(DbContextOptions<FinanceContext> options)
+        public FinanceContext(DbContextOptions options)
             : base(options)
         {
 
@@ -37,12 +37,17 @@ namespace PersonalFinance.Data
 
             builder.ApplyConfiguration(new RoleConfiguration());
         }
-        /*
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseLoggerFactory(ConsoleLoggerFactory);
+            //optionsBuilder.UseLoggerFactory(ConsoleLoggerFactory);
+            //If not configured this will use in memory database
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EFProviders.InMemory;Trusted_Connection=True;ConnectRetryCount=0");
+            }
         }
-        */
+        
 
     }
 }

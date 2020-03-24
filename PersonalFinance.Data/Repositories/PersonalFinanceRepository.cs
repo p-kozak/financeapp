@@ -54,34 +54,36 @@ namespace PersonalFinance.Data.Repositories
             context.SaveChanges();
         }
 
-        public CustomerBalance GetBalance(Customer user, int currency)
+        public CustomerBalance GetBalance(Customer customer, int currency)
         {
-            if (!UserExists(user))
+            if (!CustomerExists(customer))
             {
                 throw new ArgumentException("User does not exists");
             }
 
             //Tro to get the balance in a given currency. If null, throw an exception
-            var balance = context.UserBalance.Where(s => s.Customer == user && s.Currency == currency).FirstOrDefault();
+            var balance = context.UserBalance.Where(s => s.Customer == customer && s.Currency == currency).FirstOrDefault();
             
             if (balance == null)
             {
-                throw new ArgumentException($"User {user.Id.ToString()} does not have balance in {Enum.GetName(typeof(Currency), currency)}");
+                throw new ArgumentException($"User {customer.Id.ToString()} does not have balance in {Enum.GetName(typeof(Currency), currency)}");
             }
             return balance;
 
         }
 
-        public bool UserExists(Customer user)
+       
+
+        public bool CustomerExists(Customer user)
         {
             return context.Customers.Any(s => s.Id == user.Id);
 
         }
 
 
-        public IEnumerable<BalanceHistory> GetBalanceHistory(Customer user, int currency)
+        public ICollection<BalanceHistory> GetBalanceHistory(Customer user, int currency)
         {
-            if(!UserExists(user))
+            if(!CustomerExists(user))
             {
                 throw new ArgumentException("User does not exist.");
             }
@@ -93,7 +95,7 @@ namespace PersonalFinance.Data.Repositories
                 throw new ArgumentException($"User {user.Id.ToString()} does not have balance in {Enum.GetName(typeof(Currency), currency)}");
             }
 
-            var history = context.BalanceHistories.Where(s => s.Customer == user && s.Currency == currency).OrderBy(s => s.Date).AsEnumerable();
+            var history = context.BalanceHistories.Where(s => s.Customer == user && s.Currency == currency).OrderBy(s => s.Date).ToList();
 
             return history;
 
@@ -127,6 +129,26 @@ namespace PersonalFinance.Data.Repositories
             context.AddRange(balance, history);
             context.SaveChanges();
 
+        }
+
+        public ICollection<CustomerBalance> GetCustomerBalances(Customer customer)
+        {
+            if (!CustomerExists(customer))
+            {
+                throw new ArgumentException("Customer does not exist");
+            }
+            var balances = context.UserBalance.Where(s => s.Customer == customer).ToList();
+            return balances;
+        }
+
+        public Customer GetCustomerByIdentityId(string identityId)
+        {
+            var customer = context.Customers.Where(s => s.IdentityId == identityId).FirstOrDefault();
+            if (customer == null)
+            {
+                throw new ArgumentException("Customer does not exist");
+            }
+            return customer;
         }
     }
 }

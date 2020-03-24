@@ -1,0 +1,11 @@
+﻿@using  PersonalFinance.Domain
+@model CustomerBalance
+
+    <div class="panel panel-default">
+        <div>
+            <span>Currency: @Enum.GetName(typeof(Currency), Model.Currency)</span>
+        </div>
+        <div >
+            <span>Balance: @Model.Balance</span>
+        </div>
+    </div>
