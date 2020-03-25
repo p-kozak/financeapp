@@ -135,6 +135,31 @@ namespace Test
 
         }
 
+        [Fact]
+        public void DeleteBalance()
+        {
+
+            Repository.OpenBalance(John, 678);
+            Repository.OpenBalance(John, 789);
+
+            var bal1 = Repository.GetBalance(John, 678);
+            var bal2 = Repository.GetBalance(John, 789);
+
+            var balancesBeforeDelete = Repository.GetCustomerBalances(John);
+
+            //Delete balances
+            Repository.CloseBalance(bal1);
+            Repository.CloseBalanceById(bal2.Id);
+
+            var balancesAfterDelete = Repository.GetCustomerBalances(John);
+
+            Assert.True(balancesBeforeDelete.Contains(bal1));
+            Assert.True(balancesBeforeDelete.Contains(bal2));
+            Assert.False(balancesAfterDelete.Contains(bal1));
+            Assert.False(balancesAfterDelete.Contains(bal2));
+
+        }
+
 
     }
 

@@ -31,11 +31,7 @@ namespace PersonalFinance
         {
             //This takes lots of space and actually querries DB 3 times instead of 2
             //Maybe add claim?
-            var user = await userManager.FindByNameAsync(User.Identity.Name);
-            Customer = personalFinanceRepository
-                .GetCustomerByIdentityId(user.Id);
-
-            CustomerBalances = personalFinanceRepository.GetCustomerBalances(Customer);
+            await FetchCustomerData();
 
             return Page();
         }
@@ -47,18 +43,47 @@ namespace PersonalFinance
                 return Page();
             }
 
-            var user = await userManager.FindByNameAsync(User.Identity.Name);
-            Customer = personalFinanceRepository
-                .GetCustomerByIdentityId(user.Id);
+            await FetchCustomerData();
+           
+
+
+            foreach (var balance in CustomerBalances)
+            {
+                if (balance.Currency == NewBalanceCurrency)
+                {
+                    ModelState.TryAddModelError("Error 1", "User already has a balance in a given currency");
+                    return Page();
+
+                }
+            }
 
 
             Console.WriteLine($"Customer {Customer.Email} \n Currency {NewBalanceCurrency}");
             personalFinanceRepository.OpenBalance(Customer, NewBalanceCurrency);
 
-            CustomerBalances = personalFinanceRepository.GetCustomerBalances(Customer);
+            //CustomerBalances = personalFinanceRepository.GetCustomerBalances(Customer);
 
             //Redirect to the same page
             return RedirectToPage("/Customers/Balances");
         }
+
+        public IActionResult OnPostCloseBalance(int balanceId)
+        {
+            Console.WriteLine($"DUPA {balanceId}");
+            personalFinanceRepository.CloseBalanceById(balanceId);
+
+            return RedirectToPage("/Customers/Balances"); ;
+        }
+
+        private async Task<User> FetchCustomerData()
+        {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            Customer = personalFinanceRepository
+                .GetCustomerByIdentityId(user.Id);
+            CustomerBalances = personalFinanceRepository.GetCustomerBalances(Customer);
+            return user;
+        }
+
+
     }
 }

@@ -150,5 +150,18 @@ namespace PersonalFinance.Data.Repositories
             }
             return customer;
         }
+
+        public void CloseBalance(CustomerBalance balance)
+        {
+            context.UserBalance.Remove(balance);
+            context.SaveChanges();
+        }
+
+        public void CloseBalanceById(int balanceId)
+        {
+            var obj = context.UserBalance.Find(balanceId);
+            context.UserBalance.Remove(obj);
+            context.SaveChanges();
+        }
     }
 }

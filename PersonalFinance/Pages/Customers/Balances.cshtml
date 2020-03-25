@@ -1,39 +1,53 @@
 ﻿@page
 @using PersonalFinance.Domain
 @model PersonalFinance.BalancesModel
-
-@if (Model.CustomerBalances.Count() == 0)
-{
-    <h1>Ohh no! No balances</h1>
-}
-else
-{
-    @foreach(var balance in Model.CustomerBalances)
-    {
-        <partial name="/Pages/Partials/_CustomerBalance.cshtml" model="balance" />
-    }
-}
-
-<h3>Add balance:</h3>
-
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Balances" method="post">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="NewBalanceCurrency">New balance currency</label>
-                <select class="form-control" asp-for="NewBalanceCurrency">
-                    @foreach(var cur in (Currency[]) Enum.GetValues(typeof(Currency)))
+    <div class="row">
+        <div class="class="col-xs-4 col-md-4"">
+            @if (Model.CustomerBalances.Count() == 0)
+            {
+                <h1>Ohh no! No balances</h1>
+            }
+            else
+            {
+                <div class="container-fluid">
+                    @foreach (var balance in Model.CustomerBalances)
                     {
-                        int opt =(int) cur;
-
-                    <option value="@opt">@Enum.GetName(typeof(Currency),cur)</option>
+                        <partial name="/Pages/Partials/_CustomerBalance.cshtml" model="balance" />
                     }
-                </select>
+                </div>
+            }
+
+            <h3>Add balance:</h3>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <form asp-action="Balances" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="NewBalanceCurrency">New balance currency</label>
+                            <select class="form-control" asp-for="NewBalanceCurrency">
+                                @foreach (var cur in (Currency[])Enum.GetValues(typeof(Currency)))
+                                {
+                                    int opt = (int)cur;
+
+                                    <option value="@opt">@Enum.GetName(typeof(Currency), cur)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" asp-page-handler="OpenBalance" />
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <input type ="submit" asp-page-handler="OpenBalance" />
-            </div>
-        </form>
+
+
+        </div>
+        <div class="col-xs-7 col-md-7">
+            Tu beda tabelki co wyswietlaja
+        </div>
     </div>
+<div class="row">
+    A tu okienko do dodawania transkacji. Albo wyzej? zobaczymy
+
 </div>

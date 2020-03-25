@@ -18,5 +18,7 @@ namespace PersonalFinance.Data.Repositories
         ICollection<CustomerBalance> GetCustomerBalances(Customer customer);
 
         Customer GetCustomerByIdentityId(string identityId);
+        void CloseBalance(CustomerBalance balance);
+        void CloseBalanceById(int balanceId);
     }
 }
