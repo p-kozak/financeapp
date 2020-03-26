@@ -17,13 +17,14 @@ namespace PersonalFinance.Data.Repositories
 
         public void AddTransaction(Transaction transaction)
         {
-            if (transaction is null)
+            if (transaction == null)
             {
                 throw new ArgumentNullException(nameof(transaction));
             }
-            var user = transaction.Customer;
+
+            var customer = transaction.Customer;
            
-            var balance = context.UserBalance.Where(s => (s.Customer == user) 
+            var balance = context.UserBalance.Where(s => (s.Customer == customer) 
             && s.Currency == transaction.Currency).FirstOrDefault();
 
             //Balance is tracked and saved automatically
@@ -31,10 +32,10 @@ namespace PersonalFinance.Data.Repositories
 
             var history = new BalanceHistory()
             {
-                Date = DateTime.Now,
+                Date = transaction.Date,
                 Currency = transaction.Currency,
                 Balance = balance.Balance,
-                Customer = user,
+                Customer = customer,
             };
 
             context.BalanceHistories.Add(history);
@@ -162,6 +163,17 @@ namespace PersonalFinance.Data.Repositories
             var obj = context.UserBalance.Find(balanceId);
             context.UserBalance.Remove(obj);
             context.SaveChanges();
+        }
+
+        public ICollection<Transaction> GetCustomerTransactions(Customer customer)
+        {
+            if (!CustomerExists(customer))
+            {
+                throw new ArgumentException("User does not exist");
+            }
+
+            var transactions = context.Transactions.Where(s => s.Customer == customer).ToList();
+            return transactions;
         }
     }
 }

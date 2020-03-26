@@ -3,19 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace PersonalFinance.Domain
+namespace PersonalFinance.Domain.DTOs
 {
-    public class Transaction
+    public class TransactionDTO
     {
-        public int Id { get; set; }
-        [Required]
-        public Customer Customer { get; set; }
-        [Required]
-        public decimal Amount { get; set; }
         [Required]
         public int Currency { get; set; }
         [Required]
-        public DateTime Date { get; set; }
+        public decimal Amount { get; set; }
         [MaxLength(300)]
         public string Description { get; set; }
     }

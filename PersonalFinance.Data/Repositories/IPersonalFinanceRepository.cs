@@ -20,5 +20,6 @@ namespace PersonalFinance.Data.Repositories
         Customer GetCustomerByIdentityId(string identityId);
         void CloseBalance(CustomerBalance balance);
         void CloseBalanceById(int balanceId);
+        ICollection<Transaction> GetCustomerTransactions(Customer customer);
     }
 }

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
-
+using PersonalFinance.Domain.DTOs;
 
 namespace PersonalFinance
 {
@@ -15,16 +16,22 @@ namespace PersonalFinance
     {
         private readonly UserManager<User> userManager;
         private readonly IPersonalFinanceRepository personalFinanceRepository;
+        private readonly IMapper mapper;
 
         public BalancesModel(UserManager<User> userManager,
-            IPersonalFinanceRepository personalFinanceRepository)
+            IPersonalFinanceRepository personalFinanceRepository,
+            IMapper mapper)
         {
             this.userManager = userManager;
             this.personalFinanceRepository = personalFinanceRepository;
+            this.mapper = mapper;
         }
 
+     
         [BindProperty]
-        public int NewBalanceCurrency { get; set; }
+        public TransactionDTO TransactionToAdd { get; set; }
+
+
         public Customer Customer { get; set; }
         public IEnumerable<CustomerBalance> CustomerBalances { get; set;}
         public async Task<IActionResult> OnGetAsync()
@@ -36,30 +43,26 @@ namespace PersonalFinance
             return Page();
         }
 
-        public async Task<IActionResult> OnPostOpenBalanceAsync()
+        public async Task<IActionResult> OnPostOpenBalanceAsync(int balanceCurrency)
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
             await FetchCustomerData();
-           
+
+          
 
 
             foreach (var balance in CustomerBalances)
             {
-                if (balance.Currency == NewBalanceCurrency)
+                if (balance.Currency == balanceCurrency)
                 {
-                    ModelState.TryAddModelError("Error 1", "User already has a balance in a given currency");
+                    ModelState.TryAddModelError("error1", "User already has a balance in a given currency");
                     return Page();
 
                 }
             }
 
 
-            Console.WriteLine($"Customer {Customer.Email} \n Currency {NewBalanceCurrency}");
-            personalFinanceRepository.OpenBalance(Customer, NewBalanceCurrency);
+            Console.WriteLine($"Customer {Customer.Email} \n Currency {balanceCurrency}");
+            personalFinanceRepository.OpenBalance(Customer, balanceCurrency);
 
             //CustomerBalances = personalFinanceRepository.GetCustomerBalances(Customer);
 
@@ -69,10 +72,29 @@ namespace PersonalFinance
 
         public IActionResult OnPostCloseBalance(int balanceId)
         {
-            Console.WriteLine($"DUPA {balanceId}");
             personalFinanceRepository.CloseBalanceById(balanceId);
 
-            return RedirectToPage("/Customers/Balances"); ;
+            return RedirectToPage("/Customers/Balances");
+        }
+
+        public async Task<IActionResult> OnPostAddTransactionAsync()
+        {
+            await FetchCustomerData();
+            //TransactionToAdd.Customer = Customer;
+            //TransactionToAdd.Date = DateTime.Now;
+
+            if (!ModelState.IsValid)
+            {
+
+               return Page();
+            }
+            //Fetch the other necessary things
+            var transaction = mapper.Map<Transaction>(TransactionToAdd);
+            transaction.Customer = Customer;
+            transaction.Date = DateTime.Now;
+            personalFinanceRepository.AddTransaction(transaction);
+            return RedirectToPage("/Customers/Balances");
+
         }
 
         private async Task<User> FetchCustomerData()
@@ -83,6 +105,9 @@ namespace PersonalFinance
             CustomerBalances = personalFinanceRepository.GetCustomerBalances(Customer);
             return user;
         }
+
+
+
 
 
     }

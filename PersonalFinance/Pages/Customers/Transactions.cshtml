@@ -1,0 +1,48 @@
+﻿@page
+@model PersonalFinance.Pages.Customers.TransactionsModel
+@{
+    ViewData["Title"] = "Transactions";
+}
+
+<h1>Transactions</h1>
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-page="/Customers/Transactions" asp-route-sortString="@Model.DateSort">Date</a>
+            </th>
+            <th>
+                <a asp-page="/Customers/Transactions" asp-route-sortString="@Model.CurrencySort">Currency</a>
+            </th>
+            <th>
+                <a asp-page="/Customers/Transactions" asp-route-sortString="@Model.AmountSort">Amount</a>
+            </th>
+            <th>
+                <a asp-page="/Customers/Transactions" asp-route-sortString="@Model.DescriptionSort">Description</a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CustomerTransactions)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Currency)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+

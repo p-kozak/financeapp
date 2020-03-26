@@ -4,6 +4,7 @@ using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
 namespace Test
@@ -158,6 +159,29 @@ namespace Test
             Assert.False(balancesAfterDelete.Contains(bal1));
             Assert.False(balancesAfterDelete.Contains(bal2));
 
+        }
+        [Fact]
+        public void GetUsersTransactions()
+        {
+            var user = GetCustomerHelper();
+            Repository.AddCustomer(user);
+            Repository.OpenBalance(user, 1);
+            Repository.OpenBalance(user, 2);
+
+            Enumerable.Range(0, 10).
+                ToList().ForEach(i =>
+                Repository.AddTransaction(new Transaction
+                {
+                    Customer = user,
+                    Date = DateTime.Now,
+                    Amount = i,
+                    Currency = i % 2 +1
+                })
+                );
+
+
+            var count = Repository.GetCustomerTransactions(user).Count();
+            Assert.Equal(10, count);
         }
 
 
