@@ -18,7 +18,7 @@ namespace PersonalFinance.Domain
         public string Description { get; set; }
         public DateTime AcquisitionDate { get; set; }
         public DateTime EndOfOwnerShipDate { get; set; }
-        /*If the asset is active or jus*/
+        /*If the asset is active or already sols*/
         [Required]
         public bool Active { get; set; }
 

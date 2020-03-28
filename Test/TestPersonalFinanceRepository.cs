@@ -2,18 +2,23 @@
 using PersonalFinance.Data;
 using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
+using PersonalFinance.Domain.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xunit;
+using Xunit.Abstractions;
+
 namespace Test
 {
     public class TestPersonalFinanceRepository
     {
+        private readonly ITestOutputHelper output;
+
         public PersonalFinanceRepository Repository { get; set; }
         public Customer John { get; set; }
-        public TestPersonalFinanceRepository()
+        public TestPersonalFinanceRepository(ITestOutputHelper output)
         {
             Repository = new PersonalFinanceRepository(GetNewContext("Repo"));
             John = new Customer
@@ -26,8 +31,7 @@ namespace Test
             //John by default has balance in currency 12345
             Repository.AddCustomer(John);
             Repository.OpenBalance(John, 12345);
-
-
+            this.output = output;
         }
 
         public Customer GetCustomerHelper()
@@ -39,6 +43,19 @@ namespace Test
                 LastName = "Doe",
                 IdentityId = "meh"
             };
+        }
+
+        public Transaction GetTransactionHelper(int currency, Customer customer, decimal amount = 50.05M)
+        {
+            return new Transaction
+            {
+                Customer = customer,
+                Date = DateTime.Now,
+                Amount = amount,
+                Currency = currency,
+                Description = DateTime.Now.ToShortTimeString()
+            };
+
         }
 
         public FinanceContext GetNewContext(string name)
@@ -182,6 +199,134 @@ namespace Test
 
             var count = Repository.GetCustomerTransactions(user).Count();
             Assert.Equal(10, count);
+        }
+
+        [Fact]
+        public void EditBalance()
+        {
+            var customer = GetCustomerHelper();
+            Repository.OpenBalance(customer, 10);
+
+            var transCountBefore = Repository.GetCustomerTransactions(customer).Count();
+
+            //edit balance
+            var balance = Repository.GetBalance(customer, 10);
+            Repository.EditBalance(balance, 50);
+            Repository.EditBalance(balance, -40);
+
+            var transCountAfter = Repository.GetCustomerTransactions(customer).Count();
+
+            Assert.Equal(0, transCountBefore);
+            Assert.Equal(2, transCountAfter);
+            Assert.Equal(-40, balance.Balance);
+
+        }
+
+        [Fact]
+        public void EditTransaction()
+        {
+            var customer = GetCustomerHelper();
+            Repository.AddCustomer(customer);
+
+            var timeNow = DateTime.Now;
+
+            var transactions = Enumerable.Range(5, 10).Select(
+                i => new Transaction 
+                {
+                    Date = timeNow.AddSeconds(i),
+                    Currency = 5, 
+                    Customer = customer,
+                    Amount = i
+                }).ToList();
+
+            Repository.OpenBalance(customer, 5);
+
+            var endSum = (5 + 14) * 10 /2;
+            transactions.ForEach(x => Repository.AddTransaction(x));
+
+            var balanceBeforeEdit = Repository.GetBalance(customer, 5).Balance;
+            var historyBeforeEdit = Repository.GetBalanceHistory(customer, 5);
+
+            Assert.Equal(10, Repository.GetCustomerTransactions(customer).Count);
+            //Edit the 3rd transaction from 7 to 17
+            Repository.EditTransaction(transactions[2], new TransactionDTO
+            { Currency = 5, Amount = 27 }
+            );
+
+
+            var balanceAfterEdit = Repository.GetBalance(customer, 5).Balance;
+            var historyAfterEdit = Repository.GetBalanceHistory(customer, 5);
+
+            historyAfterEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Balance} {x.Date}"));
+            output.WriteLine("DUPA");
+            historyBeforeEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Balance} {x.Date}"));
+
+            Assert.Equal(endSum, balanceBeforeEdit);
+            Assert.Equal(endSum+20, balanceAfterEdit);
+            //check if balance beforeedit are the same
+            historyBeforeEdit.Where(s => s.Date < transactions[2].Date).ToList()
+                .ForEach(x => Assert.Equal(x.Balance, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Balance));
+
+            historyBeforeEdit.Where(s => s.Date >= transactions[2].Date).ToList()
+                .ForEach(x => Assert.Equal(x.Balance + 20, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Balance));
+
+           
+        }
+
+        [Fact]
+        public void EditTransactionDelete()
+        {
+            var customer = GetCustomerHelper();
+            Repository.AddCustomer(customer);
+
+            var timeNow = DateTime.Now;
+
+            var transactions = Enumerable.Range(5, 10).Select(
+                i => new Transaction
+                {
+                    Date = timeNow.AddSeconds(i),
+                    Currency = 5,
+                    Customer = customer,
+                    Amount = i
+                }).ToList();
+
+            Repository.OpenBalance(customer, 5);
+
+            var endSum = (5 + 14) * 10 / 2;
+            transactions.ForEach(x => Repository.AddTransaction(x));
+
+            var balanceBeforeEdit = Repository.GetBalance(customer, 5).Balance;
+            var historyBeforeEdit = Repository.GetBalanceHistory(customer, 5);
+
+            Assert.Equal(10, Repository.GetCustomerTransactions(customer).Count);
+            //Edit the 3rd transaction from 7 to 17
+            Repository.EditTransaction(transactions[2], new TransactionDTO
+            { Currency = 5, Amount = 0.0M }
+            );
+
+
+            var balanceAfterEdit = Repository.GetBalance(customer, 5).Balance;
+            var historyAfterEdit = Repository.GetBalanceHistory(customer, 5);
+
+            historyAfterEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Balance} {x.Date}"));
+            output.WriteLine("DUPA");
+            historyBeforeEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Balance} {x.Date}"));
+
+            Assert.Equal(endSum, balanceBeforeEdit);
+            Assert.Equal(endSum - 7, balanceAfterEdit);
+
+            //check if balance beforeedit are the same
+            Assert.NotEqual(historyAfterEdit.Count, historyBeforeEdit.Count);
+
+            historyBeforeEdit.Where(s => s.Date < transactions[2].Date).ToList()
+                .ForEach(x => Assert.Equal(x.Balance, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Balance));
+
+            historyBeforeEdit.Where(s => s.Date > transactions[2].Date).ToList()
+                .ForEach(x => Assert.Equal(x.Balance -7, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Balance));
+
+            //Don't expect to see deleted date in the collection
+            Assert.Empty(historyAfterEdit.Where(x => x.Date == transactions[2].Date));
+
         }
 
 

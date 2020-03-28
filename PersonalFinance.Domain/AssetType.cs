@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PersonalFinance.Domain
 {
-    public enum AssetTypes
+    public enum AssetType
     {
         Car = 0,
         ResidentialProperty = 1,

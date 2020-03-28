@@ -1,4 +1,5 @@
 ﻿using PersonalFinance.Domain;
+using PersonalFinance.Domain.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,5 +22,8 @@ namespace PersonalFinance.Data.Repositories
         void CloseBalance(CustomerBalance balance);
         void CloseBalanceById(int balanceId);
         ICollection<Transaction> GetCustomerTransactions(Customer customer);
+
+        void EditBalance(CustomerBalance balance, decimal newValue);
+        void EditTransaction(Transaction oldTransaction, TransactionDTO newTransaction);
     }
 }

@@ -1,5 +1,6 @@
 ﻿@page
 @model PersonalFinance.Pages.Customers.TransactionsModel
+@using PersonalFinance.Domain 
 @{
     ViewData["Title"] = "Transactions";
 }
@@ -28,12 +29,15 @@
     <tbody>
         @foreach (var item in Model.CustomerTransactions)
         {
+            string cur = Enum.GetName(typeof(Currency), item.Currency);
+
+
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Date)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Currency)
+                @Html.DisplayFor(modelItem => cur)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Amount)
