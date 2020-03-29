@@ -7,7 +7,16 @@
 
 <h1>Transactions</h1>
 
-
+<form asp-page="/Customers/Transactions" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by name:
+            <input type="text" name="filterString"/>
+            <input type="submit" value="Search" class="btn btn-primary" /> |
+            <a asp-page="/Customers/Transactions" asp-route-filterString="">Back to full List</a>
+        </p>
+    </div>
+</form>
 
 <table class="table">
     <thead>
@@ -23,6 +32,9 @@
             </th>
             <th>
                 <a asp-page="/Customers/Transactions" asp-route-sortString="@Model.DescriptionSort">Description</a>
+            </th>
+            <th>
+                Options
             </th>
         </tr>
     </thead>
@@ -45,8 +57,13 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
+            <td>
+                <form asp-action="Transactions" method="post">
+                    <input type="hidden" name="transactionId" value="@item.Id" />
+                    <input type="submit" asp-page-handler="EditTransaction" value="Edit" class="btn btn-secondary" />
+                </form>
+            </td>
         </tr>
         }
     </tbody>
 </table>
-

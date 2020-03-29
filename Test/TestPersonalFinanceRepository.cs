@@ -329,6 +329,27 @@ namespace Test
 
         }
 
+        [Fact]
+        public void GetTransactionById()
+        {
+            var customer = GetCustomerHelper();
+            Repository.AddCustomer(customer);
+            Repository.OpenBalance(customer, 5);
+
+            var trans = GetTransactionHelper(5, customer);
+            Repository.AddTransaction(trans);
+            output.WriteLine($"Trans is {trans.Id.ToString()}");
+
+            var retrivedTrans = Repository.GetTransactionById(trans.Id);
+            output.WriteLine($"retrived is {retrivedTrans.Id.ToString()}");
+
+            Assert.NotNull(retrivedTrans);
+            Assert.NotNull(retrivedTrans.Customer);
+            Assert.Equal(customer.Id, retrivedTrans.Customer.Id);
+            Assert.Equal("John", retrivedTrans.Customer.FirstName);
+        }
+
+
 
     }
 

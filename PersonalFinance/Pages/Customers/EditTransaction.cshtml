@@ -1,0 +1,35 @@
+﻿@page
+@model PersonalFinance.Pages.Customers.EditTransactionModel
+@{
+    ViewData["Title"] = "EditTransaction";
+}
+
+<h1>Edit Transaction</h1>
+<h4>@Model.Transaction.Date</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditTransaction">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="TransactionDTO.Amount" class="control-label"></label>
+                <input type="number" step="0.01" asp-for="TransactionDTO.Amount" class="form-control" value="@Model.Transaction.Amount" />
+                <span asp-validation-for="TransactionDTO.Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransactionDTO.Description" class="control-label"></label>
+                <textarea asp-for="TransactionDTO.Description" class="form-control">@Model.Transaction.Description.ToString()</textarea>
+                <span asp-validation-for="TransactionDTO.Description" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="TransactionDTO.Currency" class="form-control" value="@Model.Transaction.Currency" />
+            <input type="hidden" asp-for="TransactionId" class="form-control" value="@Model.Transaction.Id" />
+
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+

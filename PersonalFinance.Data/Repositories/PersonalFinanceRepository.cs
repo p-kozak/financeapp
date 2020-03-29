@@ -65,7 +65,8 @@ namespace PersonalFinance.Data.Repositories
             }
 
             //Tro to get the balance in a given currency. If null, throw an exception
-            var balance = context.UserBalance.Where(s => s.Customer == customer && s.Currency == currency).FirstOrDefault();
+            var balance = context.UserBalance
+                .Where(s => s.Customer == customer && s.Currency == currency).FirstOrDefault();
             
             if (balance == null)
             {
@@ -79,6 +80,11 @@ namespace PersonalFinance.Data.Repositories
 
         public bool CustomerExists(Customer user)
         {
+            if (user == null)
+            {
+                throw new ArgumentException("User is null.");
+            }
+
             return context.Customers.Any(s => s.Id == user.Id);
 
         }
@@ -156,13 +162,20 @@ namespace PersonalFinance.Data.Repositories
 
         public void CloseBalance(CustomerBalance balance)
         {
+            var transactions = GetCustomerTransactions(balance.Customer).Where(s => s.Currency == balance.Currency);
+            context.Transactions.RemoveRange(transactions);
             context.UserBalance.Remove(balance);
             context.SaveChanges();
         }
 
         public void CloseBalanceById(int balanceId)
         {
-            var obj = context.UserBalance.Find(balanceId);
+            var obj = context.UserBalance.Where( s => s.Id == balanceId).Include(x => x.Customer).FirstOrDefault();
+
+            var transactions = GetCustomerTransactions(obj.Customer).Where(s => s.Currency == obj.Currency);
+            var history = GetBalanceHistory(obj.Customer, obj.Currency);
+            context.BalanceHistories.RemoveRange(history);
+            context.Transactions.RemoveRange(transactions);
             context.UserBalance.Remove(obj);
             context.SaveChanges();
         }
@@ -175,7 +188,7 @@ namespace PersonalFinance.Data.Repositories
             }
 
             var transactions = context.Transactions
-                .AsNoTracking().Where(s => s.Customer == customer).ToList();
+                .Where(s => s.Customer == customer).Include(s => s.Customer).ToList();
             return transactions;
         }
 
@@ -262,5 +275,14 @@ namespace PersonalFinance.Data.Repositories
 
         }
 
+        public Transaction GetTransactionById(int id)
+        {
+            var trans = context.Transactions.Where(s => s.Id == id).Include(s => s.Customer).FirstOrDefault(); ;
+            if (trans == null)
+            {
+                throw new ArgumentException($"Transaction {id} does not exist");
+            }
+            return trans;
+        }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
+using PersonalFinance.Domain.DTOs;
 
 namespace PersonalFinance.Pages.Customers
 {
@@ -22,7 +23,9 @@ namespace PersonalFinance.Pages.Customers
             this.userManager = userManager;
         }
 
+
         public Customer Customer { get; set; }
+        
         public ICollection<Transaction> CustomerTransactions { get; set; }
 
 
@@ -49,7 +52,7 @@ namespace PersonalFinance.Pages.Customers
                 CustomerTransactions = CustomerTransactions.Where(s => s.Date.ToString().Contains(filterString) ||
                 s.Amount.ToString().Contains(filterString) ||
                 s.Currency.ToString().Contains(filterString) ||
-                s.Description.ToString().Contains(filterString)
+                (s.Description ?? "").ToString().Contains(filterString)
                 ).ToList();
             }
 
@@ -91,6 +94,11 @@ namespace PersonalFinance.Pages.Customers
             return Page();
 
 
+        }
+
+        public IActionResult OnPostEditTransaction(int transactionId)
+        {
+            return RedirectToPage("/Customers/EditTransaction", new { transId = transactionId });
         }
     }
 }

@@ -25,5 +25,6 @@ namespace PersonalFinance.Data.Repositories
 
         void EditBalance(CustomerBalance balance, decimal newValue);
         void EditTransaction(Transaction oldTransaction, TransactionDTO newTransaction);
+        Transaction GetTransactionById(int id);
     }
 }
