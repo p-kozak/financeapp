@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
-using PersonalFinance.Domain.DTOs;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PersonalFinance.Pages.Customers
 {
@@ -25,7 +23,7 @@ namespace PersonalFinance.Pages.Customers
 
 
         public Customer Customer { get; set; }
-        
+
         public ICollection<Transaction> CustomerTransactions { get; set; }
 
 

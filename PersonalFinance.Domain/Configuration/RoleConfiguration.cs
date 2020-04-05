@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PersonalFinance.Domain.Configuration
 {
@@ -18,8 +15,9 @@ namespace PersonalFinance.Domain.Configuration
                     Name = "Visitor",
                     NormalizedName = "VISITOR"
                 },
-                new IdentityRole {
-                    Id= "6b122f3c-8700-4208-8902-d77b72eff1b9",
+                new IdentityRole
+                {
+                    Id = "6b122f3c-8700-4208-8902-d77b72eff1b9",
                     Name = "Customer",
                     NormalizedName = "CUSTOMER"
                 },
@@ -28,7 +26,7 @@ namespace PersonalFinance.Domain.Configuration
                     Id = "3cd25e1b-2501-4fce-8bac-fb7ab724d6a0",
                     Name = "Admin",
                     NormalizedName = "ADMIN"
-                }) ;
+                });
         }
     }
 }

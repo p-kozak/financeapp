@@ -4,7 +4,6 @@ using PersonalFinance.Domain.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace PersonalFinance.Data.Repositories
 {
@@ -25,8 +24,8 @@ namespace PersonalFinance.Data.Repositories
             }
 
             var customer = transaction.Customer;
-           
-            var balance = context.UserBalance.Where(s => (s.Customer == customer) 
+
+            var balance = context.UserBalance.Where(s => (s.Customer == customer)
             && s.Currency == transaction.Currency).FirstOrDefault();
 
             //Balance is tracked and saved automatically
@@ -36,7 +35,8 @@ namespace PersonalFinance.Data.Repositories
             {
                 Date = transaction.Date,
                 Currency = transaction.Currency,
-                Balance = balance.Balance,
+                Amount = balance.Balance,
+                TrackedBalance = balance,
                 Customer = customer,
             };
 
@@ -45,7 +45,7 @@ namespace PersonalFinance.Data.Repositories
             context.SaveChanges();
         }
 
-    
+
 
         public void AddCustomer(Customer customer)
         {
@@ -67,7 +67,7 @@ namespace PersonalFinance.Data.Repositories
             //Tro to get the balance in a given currency. If null, throw an exception
             var balance = context.UserBalance
                 .Where(s => s.Customer == customer && s.Currency == currency).FirstOrDefault();
-            
+
             if (balance == null)
             {
                 throw new ArgumentException($"User {customer.Id.ToString()} does not have balance in {Enum.GetName(typeof(Currency), currency)}");
@@ -76,7 +76,7 @@ namespace PersonalFinance.Data.Repositories
 
         }
 
-       
+
 
         public bool CustomerExists(Customer user)
         {
@@ -90,25 +90,22 @@ namespace PersonalFinance.Data.Repositories
         }
 
 
-        public ICollection<BalanceHistory> GetBalanceHistory(Customer user, int currency)
+        public ICollection<BalanceHistory> GetBalanceHistory(CustomerBalance balance)
         {
-            if(!CustomerExists(user))
-            {
-                throw new ArgumentException("User does not exist.");
-            }
 
-            var balance = context.UserBalance.Where(s => s.Customer == user && s.Currency == currency).FirstOrDefault();
-
-            if (balance == null)
-            {
-                throw new ArgumentException($"User {user.Id.ToString()} does not have balance in {Enum.GetName(typeof(Currency), currency)}");
-            }
-
-            var history = context.BalanceHistories.AsNoTracking().Where(s => s.Customer == user && s.Currency == currency).OrderBy(s => s.Date).ToList();
+            var history = context.BalanceHistories.AsNoTracking().Where(s => s.TrackedBalance == balance).OrderBy(s => s.Date).ToList();
 
             return history;
 
         }
+        public ICollection<BalanceHistory> GetBalanceHistoryById(int balanceId)
+        {
+            var history = context.BalanceHistories.AsNoTracking().Where(s => s.Id == balanceId).OrderBy(s => s.Date).ToList();
+
+            return history;
+
+        }
+
 
         public void OpenBalance(Customer user, int currency)
         {
@@ -132,7 +129,8 @@ namespace PersonalFinance.Data.Repositories
                 Currency = currency,
                 Customer = user,
                 Date = DateTime.Now,
-                Balance = 0
+                TrackedBalance = balance,
+                Amount = 0
             };
 
             context.AddRange(balance, history);
@@ -170,10 +168,10 @@ namespace PersonalFinance.Data.Repositories
 
         public void CloseBalanceById(int balanceId)
         {
-            var obj = context.UserBalance.Where( s => s.Id == balanceId).Include(x => x.Customer).FirstOrDefault();
+            var obj = context.UserBalance.Where(s => s.Id == balanceId).Include(x => x.Customer).FirstOrDefault();
 
             var transactions = GetCustomerTransactions(obj.Customer).Where(s => s.Currency == obj.Currency);
-            var history = GetBalanceHistory(obj.Customer, obj.Currency);
+            var history = GetBalanceHistoryById(balanceId);
             context.BalanceHistories.RemoveRange(history);
             context.Transactions.RemoveRange(transactions);
             context.UserBalance.Remove(obj);
@@ -232,20 +230,20 @@ namespace PersonalFinance.Data.Repositories
 
 
             //Check if we update transaction value. If they are the same, just return
-            if( Double.Equals(oldTransaction.Amount, newTransaction.Amount))
+            if (Double.Equals(oldTransaction.Amount, newTransaction.Amount))
             {
                 return;
             }
 
             var difference = newTransaction.Amount - oldTransaction.Amount;
 
-            var history = context.BalanceHistories.Where(s => s.Customer == oldTransaction.Customer 
+            var history = context.BalanceHistories.Where(s => s.Customer == oldTransaction.Customer
             && s.Currency == oldTransaction.Currency
             && s.Date >= oldTransaction.Date);
 
             foreach (var record in history)
             {
-                record.Balance += difference;
+                record.Amount += difference;
             }
 
             //You also need to update current balance
@@ -271,7 +269,7 @@ namespace PersonalFinance.Data.Repositories
 
             context.Transactions.Update(oldTransaction);
             context.SaveChanges();
-     
+
 
         }
 

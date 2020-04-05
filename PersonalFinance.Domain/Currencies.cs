@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PersonalFinance.Domain
+﻿namespace PersonalFinance.Domain
 {
     /*Use ISO curency codes standard*/
     public enum Currency
@@ -10,6 +6,7 @@ namespace PersonalFinance.Domain
         USD = 840,
         GBP = 826,
         PLN = 985,
-        AUD = 036
+        AUD = 036,
+        RUB = 643
     }
 }

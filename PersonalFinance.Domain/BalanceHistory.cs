@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace PersonalFinance.Domain
 {
@@ -11,11 +9,13 @@ namespace PersonalFinance.Domain
         [Key]
         public int Id { get; set; }
         [Required]
+        public CustomerBalance TrackedBalance { get; set; }
+        [Required]
         public Customer Customer { get; set; }
         public DateTime Date { get; set; }
 
         [Required]
-        public decimal Balance { get; set;}
+        public decimal Amount { get; set; }
         [Required]
         public int Currency { get; set; }
 

@@ -1,17 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace PersonalFinance.Domain
 {
-    public class Customer 
+    public class Customer
     {
         [Key]
         public int Id { get; set; }
         [Required]
-        public string IdentityId { get; set;}
+        public string IdentityId { get; set; }
         [Required, EmailAddress]
         public String Email { get; set; }
         [Required, StringLength(50)]

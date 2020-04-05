@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PersonalFinance
 {
@@ -19,7 +18,7 @@ namespace PersonalFinance
         private readonly SignInManager<User> signInManager;
 
         [BindProperty]
-        public UserRegistrationModel  UserToRegister { get; set; }
+        public UserRegistrationModel UserToRegister { get; set; }
 
 
         //Dependency injection
@@ -41,7 +40,7 @@ namespace PersonalFinance
 
         }
 
-        public async  Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
@@ -71,7 +70,7 @@ namespace PersonalFinance
                 await userManager.AddToRoleAsync(user, "Customer");
                 await signInManager.SignInAsync(user, isPersistent: false);
             }
-            
+
             else
             {
                 foreach (var error in result.Errors)
@@ -81,7 +80,7 @@ namespace PersonalFinance
 
                 return Page();
             }
-            
+
             return RedirectToPage("/Index");
 
         }

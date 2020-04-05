@@ -4,9 +4,7 @@ using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
 using PersonalFinance.Domain.DTOs;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -99,7 +97,7 @@ namespace Test
                 LastName = "b",
                 Email = "a@a.a"
             };
-            
+
             Repository.AddCustomer(customer);
             Assert.Throws<ArgumentException>(() => Repository.GetBalance(customer, currency));
 
@@ -130,8 +128,6 @@ namespace Test
 
             var balances2 = Repository.GetCustomerBalances(customer);
             Assert.Equal(2, balances2.Count);
-
-
 
         }
         [Fact]
@@ -192,7 +188,7 @@ namespace Test
                     Customer = user,
                     Date = DateTime.Now,
                     Amount = i,
-                    Currency = i % 2 +1
+                    Currency = i % 2 + 1
                 })
                 );
 
@@ -231,21 +227,22 @@ namespace Test
             var timeNow = DateTime.Now;
 
             var transactions = Enumerable.Range(5, 10).Select(
-                i => new Transaction 
+                i => new Transaction
                 {
                     Date = timeNow.AddSeconds(i),
-                    Currency = 5, 
+                    Currency = 5,
                     Customer = customer,
                     Amount = i
                 }).ToList();
 
             Repository.OpenBalance(customer, 5);
 
-            var endSum = (5 + 14) * 10 /2;
+            var balance = Repository.GetBalance(customer, 5);
+            var endSum = (5 + 14) * 10 / 2;
             transactions.ForEach(x => Repository.AddTransaction(x));
 
             var balanceBeforeEdit = Repository.GetBalance(customer, 5).Balance;
-            var historyBeforeEdit = Repository.GetBalanceHistory(customer, 5);
+            var historyBeforeEdit = Repository.GetBalanceHistory(balance);
 
             Assert.Equal(10, Repository.GetCustomerTransactions(customer).Count);
             //Edit the 3rd transaction from 7 to 17
@@ -255,22 +252,22 @@ namespace Test
 
 
             var balanceAfterEdit = Repository.GetBalance(customer, 5).Balance;
-            var historyAfterEdit = Repository.GetBalanceHistory(customer, 5);
+            var historyAfterEdit = Repository.GetBalanceHistory(balance);
 
-            historyAfterEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Balance} {x.Date}"));
+            historyAfterEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Amount} {x.Date}"));
             output.WriteLine("DUPA");
-            historyBeforeEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Balance} {x.Date}"));
+            historyBeforeEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Amount} {x.Date}"));
 
             Assert.Equal(endSum, balanceBeforeEdit);
-            Assert.Equal(endSum+20, balanceAfterEdit);
+            Assert.Equal(endSum + 20, balanceAfterEdit);
             //check if balance beforeedit are the same
             historyBeforeEdit.Where(s => s.Date < transactions[2].Date).ToList()
-                .ForEach(x => Assert.Equal(x.Balance, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Balance));
+                .ForEach(x => Assert.Equal(x.Amount, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Amount));
 
             historyBeforeEdit.Where(s => s.Date >= transactions[2].Date).ToList()
-                .ForEach(x => Assert.Equal(x.Balance + 20, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Balance));
+                .ForEach(x => Assert.Equal(x.Amount + 20, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Amount));
 
-           
+
         }
 
         [Fact]
@@ -294,9 +291,10 @@ namespace Test
 
             var endSum = (5 + 14) * 10 / 2;
             transactions.ForEach(x => Repository.AddTransaction(x));
+            var balance = Repository.GetBalance(customer, 5);
 
             var balanceBeforeEdit = Repository.GetBalance(customer, 5).Balance;
-            var historyBeforeEdit = Repository.GetBalanceHistory(customer, 5);
+            var historyBeforeEdit = Repository.GetBalanceHistory(balance);
 
             Assert.Equal(10, Repository.GetCustomerTransactions(customer).Count);
             //Edit the 3rd transaction from 7 to 17
@@ -306,11 +304,11 @@ namespace Test
 
 
             var balanceAfterEdit = Repository.GetBalance(customer, 5).Balance;
-            var historyAfterEdit = Repository.GetBalanceHistory(customer, 5);
+            var historyAfterEdit = Repository.GetBalanceHistory(balance);
 
-            historyAfterEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Balance} {x.Date}"));
+            historyAfterEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Amount} {x.Date}"));
             output.WriteLine("DUPA");
-            historyBeforeEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Balance} {x.Date}"));
+            historyBeforeEdit.ToList().ForEach(x => output.WriteLine($"{x.Id.ToString()}  {x.Amount} {x.Date}"));
 
             Assert.Equal(endSum, balanceBeforeEdit);
             Assert.Equal(endSum - 7, balanceAfterEdit);
@@ -319,10 +317,10 @@ namespace Test
             Assert.NotEqual(historyAfterEdit.Count, historyBeforeEdit.Count);
 
             historyBeforeEdit.Where(s => s.Date < transactions[2].Date).ToList()
-                .ForEach(x => Assert.Equal(x.Balance, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Balance));
+                .ForEach(x => Assert.Equal(x.Amount, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Amount));
 
             historyBeforeEdit.Where(s => s.Date > transactions[2].Date).ToList()
-                .ForEach(x => Assert.Equal(x.Balance -7, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Balance));
+                .ForEach(x => Assert.Equal(x.Amount - 7, historyAfterEdit.Where(s => s.Id == x.Id).FirstOrDefault().Amount));
 
             //Don't expect to see deleted date in the collection
             Assert.Empty(historyAfterEdit.Where(x => x.Date == transactions[2].Date));

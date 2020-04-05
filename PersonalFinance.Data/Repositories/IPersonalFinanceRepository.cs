@@ -1,8 +1,6 @@
 ﻿using PersonalFinance.Domain;
 using PersonalFinance.Domain.DTOs;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace PersonalFinance.Data.Repositories
 {
@@ -14,7 +12,9 @@ namespace PersonalFinance.Data.Repositories
         void OpenBalance(Customer user, int currency);
         bool CustomerExists(Customer user);
         CustomerBalance GetBalance(Customer user, int currency);
-        ICollection<BalanceHistory> GetBalanceHistory(Customer customer, int currency);
+        ICollection<BalanceHistory> GetBalanceHistory(CustomerBalance balance);
+        ICollection<BalanceHistory> GetBalanceHistoryById(int balanceId);
+
 
         ICollection<CustomerBalance> GetCustomerBalances(Customer customer);
 
@@ -26,5 +26,7 @@ namespace PersonalFinance.Data.Repositories
         void EditBalance(CustomerBalance balance, decimal newValue);
         void EditTransaction(Transaction oldTransaction, TransactionDTO newTransaction);
         Transaction GetTransactionById(int id);
+
+
     }
 }

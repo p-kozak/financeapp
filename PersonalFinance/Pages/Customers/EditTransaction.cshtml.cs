@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
 using PersonalFinance.Domain.DTOs;
+using System;
+using System.Threading.Tasks;
 
 namespace PersonalFinance.Pages.Customers
 {
@@ -53,7 +51,7 @@ namespace PersonalFinance.Pages.Customers
             var intId = int.Parse(transId);
             var transaction = personalFinanceRepository.GetTransactionById(intId);
 
-            if(transaction.Customer.IdentityId != Customer.IdentityId)
+            if (transaction.Customer.IdentityId != Customer.IdentityId)
             {
                 return RedirectToPage("/Customers/Transactions");
             }
@@ -98,10 +96,10 @@ namespace PersonalFinance.Pages.Customers
             personalFinanceRepository.EditTransaction(transaction, TransactionDTO);
             return RedirectToPage("/Customers/Transactions");
         }
-       
 
-        
-        
+
+
+
 
 
     }

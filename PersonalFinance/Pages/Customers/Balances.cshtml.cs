@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
 using PersonalFinance.Domain.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PersonalFinance
 {
@@ -27,13 +26,13 @@ namespace PersonalFinance
             this.mapper = mapper;
         }
 
-     
+
         [BindProperty]
         public TransactionDTO TransactionToAdd { get; set; }
 
 
         public Customer Customer { get; set; }
-        public IEnumerable<CustomerBalance> CustomerBalances { get; set;}
+        public IEnumerable<CustomerBalance> CustomerBalances { get; set; }
         public async Task<IActionResult> OnGetAsync()
         {
             //This takes lots of space and actually querries DB 3 times instead of 2
@@ -47,7 +46,7 @@ namespace PersonalFinance
         {
             await FetchCustomerData();
 
-          
+
 
 
             foreach (var balance in CustomerBalances)
@@ -86,7 +85,7 @@ namespace PersonalFinance
             if (!ModelState.IsValid)
             {
 
-               return Page();
+                return Page();
             }
             //Fetch the other necessary things
             var transaction = mapper.Map<Transaction>(TransactionToAdd);

@@ -36,7 +36,7 @@ namespace PersonalFinance.Data
             base.OnModelCreating(builder);
             builder.ApplyConfiguration(new RoleConfiguration());
         }
-        
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseLoggerFactory(ConsoleLoggerFactory);
@@ -46,7 +46,7 @@ namespace PersonalFinance.Data
                 optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EFProviders.InMemory;Trusted_Connection=True;ConnectRetryCount=0");
             }
         }
-        
+
 
     }
 }

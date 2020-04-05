@@ -10,8 +10,8 @@ using PersonalFinance.Data;
 namespace PersonalFinance.Data.Migrations
 {
     [DbContext(typeof(FinanceContext))]
-    [Migration("20200326122529_TransDate")]
-    partial class TransDate
+    [Migration("20200403194533_History")]
+    partial class History
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -51,21 +51,21 @@ namespace PersonalFinance.Data.Migrations
                         new
                         {
                             Id = "cef3b69a-9c1d-4bbd-8c98-e3024d93c924",
-                            ConcurrencyStamp = "d1306c5f-a847-471c-ab8e-1f333b3594cd",
+                            ConcurrencyStamp = "5f45ac63-c748-4293-aa45-26362939deb5",
                             Name = "Visitor",
                             NormalizedName = "VISITOR"
                         },
                         new
                         {
                             Id = "6b122f3c-8700-4208-8902-d77b72eff1b9",
-                            ConcurrencyStamp = "a7f4e992-c17d-4146-a63c-fd122b1839ba",
+                            ConcurrencyStamp = "728548f1-5080-460c-a69e-be62ad35e72c",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
                             Id = "3cd25e1b-2501-4fce-8bac-fb7ab724d6a0",
-                            ConcurrencyStamp = "158a2b7c-7779-4326-a5dc-0f03426fd0dd",
+                            ConcurrencyStamp = "0b2dda8e-72ac-42cd-9a67-b8fae3b2a953",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -182,7 +182,7 @@ namespace PersonalFinance.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("Balance")
+                    b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Currency")
@@ -194,9 +194,14 @@ namespace PersonalFinance.Data.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("TrackedBalanceId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("TrackedBalanceId");
 
                     b.ToTable("BalanceHistories");
                 });
@@ -282,7 +287,8 @@ namespace PersonalFinance.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(300)")
+                        .HasMaxLength(300);
 
                     b.HasKey("Id");
 
@@ -418,6 +424,12 @@ namespace PersonalFinance.Data.Migrations
                     b.HasOne("PersonalFinance.Domain.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PersonalFinance.Domain.CustomerBalance", "TrackedBalance")
+                        .WithMany()
+                        .HasForeignKey("TrackedBalanceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

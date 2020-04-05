@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PersonalFinance.Domain;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PersonalFinance
 {
@@ -35,8 +32,8 @@ namespace PersonalFinance
             return Page();
 
         }
-        
-  
+
+
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -50,7 +47,7 @@ namespace PersonalFinance
             }
 
             var result = await signInManager.PasswordSignInAsync(UserLoginModel.Email, UserLoginModel.Password, UserLoginModel.RememberMe, false);
-            
+
             if (result.Succeeded)
             {
                 return RedirectToPage("/Index");

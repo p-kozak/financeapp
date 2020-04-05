@@ -1,10 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalFinance.Data;
 using PersonalFinance.Domain;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Test

@@ -11,12 +11,12 @@
         <form asp-action="Login">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="UserLoginModel.Email" class="control-label"></label>
+                <label asp-for="UserLoginModel.Email" class="control-label">Email address</label>
                 <input asp-for="UserLoginModel.Email" class="form-control" />
                 <span asp-validation-for="UserLoginModel.Email" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="UserLoginModel.Password" class="control-label"></label>
+                <label asp-for="UserLoginModel.Password" class="control-label">Password</label>
                 <input asp-for="UserLoginModel.Password" class="form-control" />
                 <span asp-validation-for="UserLoginModel.Password" class="text-danger"></span>
             </div>
