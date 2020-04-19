@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using PersonalFinance.Data;
 using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
+using PersonalFinance.Services;
 
 namespace PersonalFinance
 {
@@ -55,6 +56,7 @@ namespace PersonalFinance
 
             services.ConfigureApplicationCookie(o => o.LoginPath = "/Users/Login");
             services.AddScoped<IPersonalFinanceRepository, PersonalFinanceRepository>();
+            services.AddScoped<ICurrencyConverter, CurrencyConverter>();
             services.AddAutoMapper(typeof(Startup));
 
         }

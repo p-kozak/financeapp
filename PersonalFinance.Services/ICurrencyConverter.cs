@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace PersonalFinance.Services
 {
-    interface ICurrencyConverter
+    public interface ICurrencyConverter
     {
         Task<String> GetLatestExchangeRates();
         decimal ConvertCustomerBalanceToGivenCurrency(CustomerBalance balance, Currency currencyTo);

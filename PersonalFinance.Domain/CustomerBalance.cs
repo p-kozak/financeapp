@@ -11,7 +11,5 @@ namespace PersonalFinance.Domain
         public decimal Balance { get; set; }
 
 
-
-
     }
 }

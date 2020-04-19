@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using PersonalFinance.Data.Repositories;
 using PersonalFinance.Domain;
 using PersonalFinance.Domain.DTOs;
+using PersonalFinance.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PersonalFinance
@@ -16,14 +18,17 @@ namespace PersonalFinance
         private readonly UserManager<User> userManager;
         private readonly IPersonalFinanceRepository personalFinanceRepository;
         private readonly IMapper mapper;
+        private readonly ICurrencyConverter currencyConverter;
 
         public BalancesModel(UserManager<User> userManager,
             IPersonalFinanceRepository personalFinanceRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ICurrencyConverter currencyConverter)
         {
             this.userManager = userManager;
             this.personalFinanceRepository = personalFinanceRepository;
             this.mapper = mapper;
+            this.currencyConverter = currencyConverter;
         }
 
 
@@ -33,11 +38,21 @@ namespace PersonalFinance
 
         public Customer Customer { get; set; }
         public IEnumerable<CustomerBalance> CustomerBalances { get; set; }
-        public async Task<IActionResult> OnGetAsync()
+        public decimal ConvertedBalance { get; set; }
+        public int ConvertedCurrency { get; set; }
+        public async Task<IActionResult> OnGetAsync(int currencyToConvert)
         {
             //This takes lots of space and actually querries DB 3 times instead of 2
             //Maybe add claim?
             await FetchCustomerData();
+
+            //Check if we have currency like this in the list of balances.
+            if(CustomerBalances.Where(o => o.Currency == currencyToConvert).Count() > 0 )
+            {
+                var convertedBalance = currencyConverter.ConvertListOfBalancesToGivenCurrency(CustomerBalances, (Currency)currencyToConvert);
+                ConvertedBalance = convertedBalance;
+                ConvertedCurrency = currencyToConvert;
+            }
 
             return Page();
         }
@@ -102,6 +117,8 @@ namespace PersonalFinance
             Customer = personalFinanceRepository
                 .GetCustomerByIdentityId(user.Id);
             CustomerBalances = personalFinanceRepository.GetCustomerBalances(Customer);
+            //var convertedBalance = currencyConverter.ConvertListOfBalancesToGivenCurrency(CustomerBalances, Currency.PLN);
+            //ConvertedBalance = convertedBalance;
             return user;
         }
 

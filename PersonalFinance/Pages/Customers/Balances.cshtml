@@ -94,10 +94,37 @@
             </div>
         </div>
         <div class="col-md-4 col-sm-4">
+            <h4>Check your net worth</h4>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @if(Model.ConvertedCurrency == 0)
+                    {
+                        <b>Currency</b>
+                    }
+                    else
+                    {
+                    <b>@Enum.GetName(typeof(Currency), Model.ConvertedCurrency).ToString()</b>
+                    }
+                    </button>
+                    <div class="dropdown-menu">
+                        @foreach (var balance in Model.CustomerBalances)
+                        {
+                            var cur = balance.Currency;
+
+                            int opt = (int)cur;
+
+                            <a class="dropdown-item" asp-page="/Customers/Balances"  
+                               asp-route-currencyToConvert="@opt">@Enum.GetName(typeof(Currency), opt).ToString()</a>
+                        }
+                    </div>
+                </div>
+                <input type="number" class="form-control" placeholder="@Math.Round(Model.ConvertedBalance,2)" readonly>
+            </div>
 
 
-            There will be some tables here later
-          
+            
+
 
 
 

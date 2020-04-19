@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PersonalFinance.Data\PersonalFinance.Data.csproj" />
     <ProjectReference Include="..\PersonalFinance.Domain\PersonalFinance.Domain.csproj" />
+    <ProjectReference Include="..\PersonalFinance.Services\PersonalFinance.Services.csproj" />
   </ItemGroup>
 
 
